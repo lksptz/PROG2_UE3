@@ -2,6 +2,12 @@ package at.ac.fhcampuswien.newsanalyzer.ui;
 
 
 import at.ac.fhcampuswien.newsanalyzer.ctrl.Controller;
+import at.ac.fhcampuswien.newsapi.NewsApi;
+import at.ac.fhcampuswien.newsapi.NewsApiBuilder;
+import at.ac.fhcampuswien.newsapi.enums.Category;
+import at.ac.fhcampuswien.newsapi.enums.Country;
+import at.ac.fhcampuswien.newsapi.enums.Endpoint;
+import at.ac.fhcampuswien.newsapi.enums.Language;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,30 +18,71 @@ public class UserInterface
 	private Controller ctrl = new Controller();
 
 	public void getDataFromCtrl1(){
-		System.out.println("ABC");
+		System.out.println("Corona in Österreich");
+		NewsApi newsApi = new NewsApiBuilder()
+				.setApiKey(Controller.APIKEY)
+				.setQ("corona")
+				.setEndPoint(Endpoint.TOP_HEADLINES)
+				.setSourceCountry(Country.at)
+				.setSourceCategory(Category.health)
+				.setPageSize("100")
+				.createNewsApi();
 
-		ctrl.process();
+		ctrl.process(newsApi);
 	}
 
 	public void getDataFromCtrl2(){
-		// TODO implement me
+		System.out.println("WWDC");
+		NewsApi newsApi = new NewsApiBuilder()
+				.setApiKey(Controller.APIKEY)
+				.setQ("wwdc")
+				.setEndPoint(Endpoint.TOP_HEADLINES)
+				.setSourceCategory(Category.technology)
+				.setLanguage(Language.en)
+				.setPageSize("100")
+				.createNewsApi();
+
+		ctrl.process(newsApi);
 	}
 
 	public void getDataFromCtrl3(){
-		// TODO implement me
+		System.out.println("EURO 2020");
+		NewsApi newsApi = new NewsApiBuilder()
+				.setApiKey(Controller.APIKEY)
+				.setQ("euro 2020".replaceAll(" ", "%20"))
+				.setEndPoint(Endpoint.TOP_HEADLINES)
+				.setSourceCategory(Category.sports)
+				.setLanguage(Language.en)
+				.setPageSize("100")
+				.createNewsApi();
+
+		ctrl.process(newsApi);
 	}
 	
 	public void getDataForCustomInput() {
-		// TODO implement me
+		System.out.print("Zu welchem Thema wollen Sie Nachrichten lesen?: ");
+		String query = readLine();
+		if (query.replaceAll("\\s", "").equals("")){
+			System.out.println("Es wurde kein Suchtext eingegeben!");
+			return;
+		}
+		NewsApi newsApi = new NewsApiBuilder()
+				.setApiKey(Controller.APIKEY)
+				.setQ(query.replaceAll(" ", "%20"))
+				.setEndPoint(Endpoint.TOP_HEADLINES)
+				.setPageSize("100")
+				.createNewsApi();
+
+		ctrl.process(newsApi);
 	}
 
 
 	public void start() {
 		Menu<Runnable> menu = new Menu<>("User Interface");
 		menu.setTitle("Wählen Sie aus:");
-		menu.insert("a", "Choice ABC", this::getDataFromCtrl1);
-		menu.insert("b", "Choice DEF", this::getDataFromCtrl2);
-		menu.insert("c", "Choice 3", this::getDataFromCtrl3);
+		menu.insert("a", "Corona in Österreich", this::getDataFromCtrl1);
+		menu.insert("b", "WWDC (EN)", this::getDataFromCtrl2);
+		menu.insert("c", "EURO 2020 (EN)", this::getDataFromCtrl3);
 		menu.insert("d", "Choice User Input:",this::getDataForCustomInput);
 		menu.insert("q", "Quit", null);
 		Runnable choice;

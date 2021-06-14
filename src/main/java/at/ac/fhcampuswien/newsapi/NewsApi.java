@@ -10,6 +10,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 
 
 public class NewsApi {
@@ -121,10 +122,13 @@ public class NewsApi {
         try {
             obj = new URL(url);
         } catch (MalformedURLException e) {
-            // TODO improve ErrorHandling
-            e.printStackTrace();
+            // TODO DONE improve ErrorHandling
+//            e.printStackTrace();
+            System.out.println("Es ist ein Fehler aufgetreten");
+            System.err.println("Error "+e.getMessage());
+            return null;
         }
-        HttpURLConnection con;
+        HttpURLConnection con = null;
         StringBuilder response = new StringBuilder();
         try {
             con = (HttpURLConnection) obj.openConnection();
@@ -135,53 +139,64 @@ public class NewsApi {
             }
             in.close();
         } catch (IOException e) {
-            // TODO improve ErrorHandling
-            System.out.println("Error "+e.getMessage());
+            // TODO DONE improve ErrorHandling
+            System.out.println("Es ist ein Fehler aufgetreten");
+            System.err.println("Error "+e.getMessage()); // out -> err
+            return null;
+        } finally {
+            if (con != null) {
+                con.disconnect();
+            }
         }
         return response.toString();
     }
 
     protected String buildURL() {
-        // TODO ErrorHandling
-        String urlbase = String.format(NEWS_API_URL,getEndpoint().getValue(),getQ(),getApiKey());
-        StringBuilder sb = new StringBuilder(urlbase);
+        // TODO DONE ErrorHandling
+        try {
+            String urlbase = String.format(NEWS_API_URL, getEndpoint().getValue(), getQ(), getApiKey());
+            StringBuilder sb = new StringBuilder(urlbase);
 
-        System.out.println(urlbase);
+            System.out.println(urlbase);
 
-        if(getFrom() != null){
-            sb.append(DELIMITER).append("from=").append(getFrom());
+            if (getFrom() != null) {
+                sb.append(DELIMITER).append("from=").append(getFrom());
+            }
+            if (getTo() != null) {
+                sb.append(DELIMITER).append("to=").append(getTo());
+            }
+            if (getPage() != null) {
+                sb.append(DELIMITER).append("page=").append(getPage());
+            }
+            if (getPageSize() != null) {
+                sb.append(DELIMITER).append("pageSize=").append(getPageSize());
+            }
+            if (getLanguage() != null) {
+                sb.append(DELIMITER).append("language=").append(getLanguage());
+            }
+            if (getSourceCountry() != null) {
+                sb.append(DELIMITER).append("country=").append(getSourceCountry());
+            }
+            if (getSourceCategory() != null) {
+                sb.append(DELIMITER).append("category=").append(getSourceCategory());
+            }
+            if (getDomains() != null) {
+                sb.append(DELIMITER).append("domains=").append(getDomains());
+            }
+            if (getExcludeDomains() != null) {
+                sb.append(DELIMITER).append("excludeDomains=").append(getExcludeDomains());
+            }
+            if (getqInTitle() != null) {
+                sb.append(DELIMITER).append("qInTitle=").append(getqInTitle());
+            }
+            if (getSortBy() != null) {
+                sb.append(DELIMITER).append("sortBy=").append(getSortBy());
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            System.err.println("Error "+e.getMessage());
+            return null;
         }
-        if(getTo() != null){
-            sb.append(DELIMITER).append("to=").append(getTo());
-        }
-        if(getPage() != null){
-            sb.append(DELIMITER).append("page=").append(getPage());
-        }
-        if(getPageSize() != null){
-            sb.append(DELIMITER).append("pageSize=").append(getPageSize());
-        }
-        if(getLanguage() != null){
-            sb.append(DELIMITER).append("language=").append(getLanguage());
-        }
-        if(getSourceCountry() != null){
-            sb.append(DELIMITER).append("country=").append(getSourceCountry());
-        }
-        if(getSourceCategory() != null){
-            sb.append(DELIMITER).append("category=").append(getSourceCategory());
-        }
-        if(getDomains() != null){
-            sb.append(DELIMITER).append("domains=").append(getDomains());
-        }
-        if(getExcludeDomains() != null){
-            sb.append(DELIMITER).append("excludeDomains=").append(getExcludeDomains());
-        }
-        if(getqInTitle() != null){
-            sb.append(DELIMITER).append("qInTitle=").append(getqInTitle());
-        }
-        if(getSortBy() != null){
-            sb.append(DELIMITER).append("sortBy=").append(getSortBy());
-        }
-        return sb.toString();
     }
 
     public NewsResponse getNews() {
@@ -193,13 +208,14 @@ public class NewsApi {
             try {
                 newsReponse = objectMapper.readValue(jsonResponse, NewsResponse.class);
                 if(!"ok".equals(newsReponse.getStatus())){
-                    System.out.println("Error: "+newsReponse.getStatus());
+                    System.err.println("Error: "+newsReponse.getStatus());
                 }
             } catch (JsonProcessingException e) {
-                System.out.println("Error: "+e.getMessage());
+                System.out.println("Es ist ein Fehler aufgetreten");
+                System.err.println("Error: "+e.getMessage());
             }
         }
-        //TODO improve Errorhandling
+        //TODO DONE improve Errorhandling
         return newsReponse;
     }
 }
